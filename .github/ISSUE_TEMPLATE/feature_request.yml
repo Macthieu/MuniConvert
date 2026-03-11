@@ -1,0 +1,32 @@
+name: Feature request
+description: Proposer une amélioration fonctionnelle
+title: "feature: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problème à résoudre
+      description: Quel besoin concret n'est pas couvert ?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposition
+      description: Décris la solution envisagée.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considérées
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact attendu
+      description: UX, robustesse, maintenance, compatibilité.

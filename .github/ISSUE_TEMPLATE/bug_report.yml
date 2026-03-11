@@ -1,0 +1,59 @@
+name: Bug report
+description: Signaler un comportement incorrect de MuniConvert
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Résumé
+      description: Décris le problème observé.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes de reproduction
+      description: Liste numérotée des étapes.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Résultat attendu
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Résultat observé
+    validations:
+      required: true
+
+  - type: input
+    id: macos
+    attributes:
+      label: Version macOS
+      placeholder: "ex: macOS 14.6"
+    validations:
+      required: true
+
+  - type: input
+    id: libreoffice
+    attributes:
+      label: Version LibreOffice
+      placeholder: "ex: 24.8.x"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Extrait du journal MuniConvert
+      render: text

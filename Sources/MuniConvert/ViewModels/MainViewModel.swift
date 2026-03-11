@@ -111,14 +111,17 @@ final class MainViewModel: ObservableObject {
     init(
         settingsStore: SettingsStore = SettingsStore(),
         libreOfficeLocator: LibreOfficeLocator = LibreOfficeLocator(),
-        coordinator: ConversionCoordinator = ConversionCoordinator()
+        coordinator: ConversionCoordinator = ConversionCoordinator(),
+        autoDetectLibreOffice: Bool = true
     ) {
         self.settingsStore = settingsStore
         self.libreOfficeLocator = libreOfficeLocator
         self.coordinator = coordinator
 
         loadSettings()
-        refreshLibreOfficeStatus()
+        if autoDetectLibreOffice {
+            refreshLibreOfficeStatus()
+        }
     }
 
     var selectedProfile: ConversionProfile? {

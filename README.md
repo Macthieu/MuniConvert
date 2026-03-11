@@ -150,6 +150,7 @@ MuniConvert/
 ## Publication GitHub et versions
 
 - Plan de releases : voir `docs/RELEASES.md`
+- Guide build/release : voir `docs/BUILD_AND_RELEASE.md`
 - CI GitHub : `swift build` + `swift test` sur macOS à chaque `push` / `pull_request`
 
 ## Licence GPLv3
@@ -158,3 +159,7 @@ Ce projet est distribué sous licence **GNU General Public License v3.0**.
 
 - Voir [LICENSE](LICENSE)
 - Les fichiers source incluent un en-tête court `SPDX-License-Identifier: GPL-3.0-only`
+
+## Sécurité
+
+- Politique de sécurité : [SECURITY.md](SECURITY.md)
