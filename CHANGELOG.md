@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-03-11
+
+### Added
+
+- Local macOS distribution scripts:
+  - `scripts/release/build_dist.sh`
+  - `scripts/release/sign_notarize.sh`
+- GitHub Actions release workflow:
+  - `.github/workflows/release-macos.yml`
+- Distribution documentation:
+  - `docs/MACOS_DISTRIBUTION.md`
+  - `docs/APPLE_SECRETS_SETUP.md`
+
+### Changed
+
+- `README.md` and `docs/BUILD_AND_RELEASE.md` updated for signed/notarized `.app` delivery flow
+- `.gitignore` updated to ignore local `dist/` artifacts
+
 ## [1.0.0] - 2026-03-11
 
 ### Added
