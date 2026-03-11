@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-03-11
+
+### Added
+
+- Stronger UI hierarchy with section cards and clearer action placement
+- Improved progress messaging during scan/conversion
+- End-of-run summary with explicit run state (ready/running/completed/cancelled/failed)
+- UX guardrails before real conversion:
+  - explicit blockers when prerequisites are missing
+  - sensitive settings recap
+  - richer confirmation message
+  - persistent simulation indicator
+
+### Changed
+
+- Results area now highlights key counters and run status more clearly
+- Conversion flow messaging clarified for non-technical users
+
 ## [0.1.1] - 2026-03-11
 
 ### Added
