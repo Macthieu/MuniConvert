@@ -37,7 +37,7 @@ struct MainView: View {
             }
             Button("Annuler", role: .cancel) {}
         } message: {
-            Text("Les fichiers originaux ne seront pas modifiés. MuniConvert créera uniquement de nouveaux fichiers de sortie. Continuer ?")
+            Text(viewModel.conversionConfirmationMessage)
         }
     }
 
@@ -119,6 +119,14 @@ struct MainView: View {
     private var conversionZone: some View {
         SectionCard(step: "2", title: "Conversion") {
             VStack(alignment: .leading, spacing: 10) {
+                if viewModel.dryRunOnly {
+                    requirementBox(
+                        title: "MODE SIMULATION ACTIF",
+                        lines: ["Aucune commande de conversion réelle ne sera exécutée."],
+                        color: .orange
+                    )
+                }
+
                 labeledRow(label: "Type de conversion") {
                     Picker("Type de conversion", selection: $viewModel.selectedProfileID) {
                         Text("Sélectionner...").tag(String?.none)
@@ -161,11 +169,25 @@ struct MainView: View {
                     .disabled(!viewModel.isRunning)
                 }
 
-                Text(viewModel.dryRunOnly
-                    ? "Mode simulation actif: aucun fichier ne sera converti."
-                    : "Conversion réelle: nouveaux fichiers de sortie créés.")
-                    .font(.caption)
-                    .foregroundStyle(viewModel.dryRunOnly ? .orange : .secondary)
+                requirementBox(
+                    title: "Paramètres sensibles",
+                    lines: viewModel.sensitiveSettingsLines,
+                    color: .secondary
+                )
+
+                if !viewModel.canStartConversion {
+                    requirementBox(
+                        title: "Conversion indisponible: préconditions manquantes",
+                        lines: viewModel.conversionBlockers,
+                        color: .red
+                    )
+                } else {
+                    requirementBox(
+                        title: "Conversion disponible",
+                        lines: ["Toutes les préconditions sont remplies."],
+                        color: .green
+                    )
+                }
             }
         }
     }
@@ -413,6 +435,31 @@ struct MainView: View {
         .overlay(
             Capsule(style: .continuous)
                 .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+        )
+    }
+
+    private func requirementBox(title: String, lines: [String], color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption.bold())
+                .foregroundStyle(color)
+
+            ForEach(lines, id: \.self) { line in
+                Text("• \(line)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(color.opacity(0.35), lineWidth: 1)
         )
     }
 }

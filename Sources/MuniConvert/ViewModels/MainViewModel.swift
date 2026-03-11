@@ -130,12 +130,70 @@ final class MainViewModel: ObservableObject {
         outputFolderURL?.path ?? "Aucun dossier de sortie"
     }
 
+    var analysisBlockers: [String] {
+        var blockers: [String] = []
+
+        if isRunning {
+            blockers.append("Un traitement est déjà en cours.")
+        }
+        if sourceFolderURL == nil {
+            blockers.append("Choisir un dossier source.")
+        }
+        if selectedProfile == nil {
+            blockers.append("Choisir un type de conversion.")
+        }
+        if useSeparateOutputFolder && outputFolderURL == nil {
+            blockers.append("Choisir un dossier de sortie.")
+        }
+
+        return blockers
+    }
+
+    var conversionBlockers: [String] {
+        var blockers = analysisBlockers
+        if !dryRunOnly && !libreOfficeFound {
+            blockers.append("LibreOffice est requis pour une conversion réelle.")
+        }
+        return blockers
+    }
+
     var canAnalyze: Bool {
-        !isRunning && sourceFolderURL != nil && selectedProfile != nil && (!useSeparateOutputFolder || outputFolderURL != nil)
+        analysisBlockers.isEmpty
     }
 
     var canStartConversion: Bool {
-        canAnalyze && (dryRunOnly || libreOfficeFound)
+        conversionBlockers.isEmpty
+    }
+
+    var sensitiveSettingsLines: [String] {
+        [
+            "Mode: \(dryRunOnly ? "Simulation (aucune conversion réelle)" : "Conversion réelle")",
+            "Sous-dossiers: \(includeSubdirectories ? "Oui" : "Non")",
+            "Sortie: \(outputModeDescription)",
+            "Arborescence: \(preserveTreeDescription)",
+            "Collision: \(collisionPolicy.displayName)"
+        ]
+    }
+
+    var conversionConfirmationMessage: String {
+        let profileName = selectedProfile?.displayName ?? "Non sélectionné"
+        let sourceLine = "Source: \(sourcePathText)"
+        let outputLine = "Sortie: \(outputModeDescription)"
+        let treeLine = "Arborescence: \(preserveTreeDescription)"
+        let collisionLine = "Collision: \(collisionPolicy.displayName)"
+        let modeLine = dryRunOnly ? "Mode: Simulation (aucun fichier créé)." : "Mode: Conversion réelle."
+
+        return [
+            "Profil: \(profileName)",
+            modeLine,
+            sourceLine,
+            outputLine,
+            treeLine,
+            collisionLine,
+            "",
+            "Les fichiers originaux ne seront jamais modifiés ni supprimés.",
+            "Continuer ?"
+        ].joined(separator: "\n")
     }
 
     var activeOutputFolder: URL? {
@@ -143,6 +201,20 @@ final class MainViewModel: ObservableObject {
             return outputFolderURL
         }
         return sourceFolderURL
+    }
+
+    private var outputModeDescription: String {
+        if useSeparateOutputFolder {
+            return outputFolderURL?.path ?? "Dossier distinct non défini"
+        }
+        return "Même dossier que la source"
+    }
+
+    private var preserveTreeDescription: String {
+        if useSeparateOutputFolder {
+            return preserveRelativeStructure ? "Préservée" : "Non préservée"
+        }
+        return "Sans objet (sortie dans le dossier source)"
     }
 
     func chooseSourceFolder() {
