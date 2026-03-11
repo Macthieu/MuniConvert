@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Xcode
+DerivedData/
+.build/
+.swiftpm/
+Package.resolved
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+xcuserdata/
+*.moved-aside
+*.xcuserstate
+
+# Swift Package Manager
+Packages/
+
+# Archives and build products
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
