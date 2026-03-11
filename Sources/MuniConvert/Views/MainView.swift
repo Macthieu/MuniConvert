@@ -127,10 +127,19 @@ struct MainView: View {
                     )
                 }
 
+                labeledRow(label: "Recherche profil") {
+                    TextField("Ex: doc, pdf, odt...", text: $viewModel.profileSearchText)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.system(.caption, design: .monospaced))
+                }
+
                 labeledRow(label: "Type de conversion") {
                     Picker("Type de conversion", selection: $viewModel.selectedProfileID) {
+                        if !viewModel.hasFilteredProfiles {
+                            Text("Aucun profil trouvé").tag(String?.none)
+                        }
                         Text("Sélectionner...").tag(String?.none)
-                        ForEach(viewModel.profiles) { profile in
+                        ForEach(viewModel.filteredProfiles) { profile in
                             Text(profile.displayName).tag(String?.some(profile.id))
                         }
                     }
@@ -168,6 +177,12 @@ struct MainView: View {
                     }
                     .disabled(!viewModel.isRunning)
                 }
+
+                requirementBox(
+                    title: "Résumé du profil actif",
+                    lines: viewModel.profileSummaryLines,
+                    color: .blue
+                )
 
                 requirementBox(
                     title: "Paramètres sensibles",

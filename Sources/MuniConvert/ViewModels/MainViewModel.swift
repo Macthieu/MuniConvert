@@ -76,6 +76,9 @@ final class MainViewModel: ObservableObject {
     @Published var selectedProfileID: String? {
         didSet { persistSettings() }
     }
+    @Published var profileSearchText: String = "" {
+        didSet { ensureSelectedProfileFitsSearch() }
+    }
     @Published var collisionPolicy: CollisionPolicy = .skipExisting {
         didSet { persistSettings() }
     }
@@ -120,6 +123,47 @@ final class MainViewModel: ObservableObject {
 
     var selectedProfile: ConversionProfile? {
         ConversionProfile.byID(selectedProfileID)
+    }
+
+    var filteredProfiles: [ConversionProfile] {
+        let query = profileSearchText
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        guard !query.isEmpty else {
+            return profiles
+        }
+
+        return profiles.filter { profile in
+            let haystack = [
+                profile.displayName.lowercased(),
+                profile.id.lowercased(),
+                profile.sourceExtensions.joined(separator: ",").lowercased(),
+                profile.targetExtension.lowercased(),
+                profile.libreOfficeTarget.lowercased()
+            ].joined(separator: "|")
+            return haystack.contains(query)
+        }
+    }
+
+    var hasFilteredProfiles: Bool {
+        !filteredProfiles.isEmpty
+    }
+
+    var profileSummaryLines: [String] {
+        guard let selectedProfile else {
+            return ["Aucun profil sélectionné."]
+        }
+
+        let sources = selectedProfile.sourceExtensions
+            .map { ".\($0)" }
+            .joined(separator: ", ")
+
+        return [
+            "Filtre source actif: \(sources) (insensible à la casse)",
+            "Extension cible: .\(selectedProfile.targetExtension)",
+            "Format LibreOffice: \(selectedProfile.libreOfficeTarget)"
+        ]
     }
 
     var sourcePathText: String {
@@ -553,6 +597,20 @@ final class MainViewModel: ObservableObject {
         )
 
         settingsStore.save(settings)
+    }
+
+    private func ensureSelectedProfileFitsSearch() {
+        guard let selectedProfile else {
+            return
+        }
+
+        guard !profileSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+
+        if !filteredProfiles.contains(selectedProfile) {
+            selectedProfileID = nil
+        }
     }
 
     private func buildLogText() -> String {

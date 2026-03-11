@@ -26,16 +26,24 @@ MuniConvert est une application macOS (Swift + SwiftUI) qui orchestre des conver
   - DOC -> DOCX
   - DOC -> PDF
   - DOCX -> PDF
+  - DOCX -> DOC
   - XLS -> XLSX
   - XLS -> PDF
   - XLSX -> PDF
+  - XLSX -> XLS
   - PPT -> PPTX
   - PPT -> PDF
   - PPTX -> PDF
+  - PPTX -> PPT
   - RTF -> DOCX
   - RTF -> PDF
   - TXT -> PDF
+  - ODT -> PDF
+  - ODS -> PDF
+  - ODP -> PDF
 - Filtrage strict par extension source, insensible à la casse
+- Recherche rapide de profil dans la zone Conversion
+- Résumé explicite du profil actif (filtre source, cible, format LibreOffice)
 - Exclusion des fichiers temporaires/système (`~$*`, `.DS_Store`, fichiers cachés selon option)
 - Sortie au choix : dossier source ou dossier de sortie distinct
 - Option de préservation de l’arborescence relative

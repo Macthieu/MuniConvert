@@ -29,15 +29,21 @@ extension ConversionProfile {
         .init(id: "doc_to_docx", displayName: "DOC -> DOCX", sourceExtensions: ["doc"], targetExtension: "docx", libreOfficeTarget: "docx"),
         .init(id: "doc_to_pdf", displayName: "DOC -> PDF", sourceExtensions: ["doc"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
         .init(id: "docx_to_pdf", displayName: "DOCX -> PDF", sourceExtensions: ["docx"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
+        .init(id: "docx_to_doc", displayName: "DOCX -> DOC", sourceExtensions: ["docx"], targetExtension: "doc", libreOfficeTarget: "doc"),
         .init(id: "xls_to_xlsx", displayName: "XLS -> XLSX", sourceExtensions: ["xls"], targetExtension: "xlsx", libreOfficeTarget: "xlsx"),
         .init(id: "xls_to_pdf", displayName: "XLS -> PDF", sourceExtensions: ["xls"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
         .init(id: "xlsx_to_pdf", displayName: "XLSX -> PDF", sourceExtensions: ["xlsx"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
+        .init(id: "xlsx_to_xls", displayName: "XLSX -> XLS", sourceExtensions: ["xlsx"], targetExtension: "xls", libreOfficeTarget: "xls"),
         .init(id: "ppt_to_pptx", displayName: "PPT -> PPTX", sourceExtensions: ["ppt"], targetExtension: "pptx", libreOfficeTarget: "pptx"),
         .init(id: "ppt_to_pdf", displayName: "PPT -> PDF", sourceExtensions: ["ppt"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
         .init(id: "pptx_to_pdf", displayName: "PPTX -> PDF", sourceExtensions: ["pptx"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
+        .init(id: "pptx_to_ppt", displayName: "PPTX -> PPT", sourceExtensions: ["pptx"], targetExtension: "ppt", libreOfficeTarget: "ppt"),
         .init(id: "rtf_to_docx", displayName: "RTF -> DOCX", sourceExtensions: ["rtf"], targetExtension: "docx", libreOfficeTarget: "docx"),
         .init(id: "rtf_to_pdf", displayName: "RTF -> PDF", sourceExtensions: ["rtf"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
-        .init(id: "txt_to_pdf", displayName: "TXT -> PDF", sourceExtensions: ["txt"], targetExtension: "pdf", libreOfficeTarget: "pdf")
+        .init(id: "txt_to_pdf", displayName: "TXT -> PDF", sourceExtensions: ["txt"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
+        .init(id: "odt_to_pdf", displayName: "ODT -> PDF", sourceExtensions: ["odt"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
+        .init(id: "ods_to_pdf", displayName: "ODS -> PDF", sourceExtensions: ["ods"], targetExtension: "pdf", libreOfficeTarget: "pdf"),
+        .init(id: "odp_to_pdf", displayName: "ODP -> PDF", sourceExtensions: ["odp"], targetExtension: "pdf", libreOfficeTarget: "pdf")
     ]
 
     static func byID(_ id: String?) -> ConversionProfile? {
