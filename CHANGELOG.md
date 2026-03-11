@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-03-11
+
+### Added
+
+- Multilingual UI support with in-app language selection:
+  - French and English resources (`Localizable.strings`)
+  - language preference persisted in settings
+  - translated labels for main interface, statuses, collision policies, summaries and key dialogs
+- New app screenshots in `docs/images/` and README visual section.
+
+### Changed
+
+- Swift Package now declares localized resources (`defaultLocalization` + `Resources` processing).
+- README updated with screenshots and multilingual usage note.
+
 ## [1.0.5] - 2026-03-11
 
 ### Added

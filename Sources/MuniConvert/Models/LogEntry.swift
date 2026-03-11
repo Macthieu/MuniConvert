@@ -11,19 +11,23 @@ enum LogStatus: String, Codable, CaseIterable {
     case dryRun
 
     var displayName: String {
+        displayName(language: .french)
+    }
+
+    func displayName(language: AppLanguage) -> String {
         switch self {
         case .matched:
-            return "matched"
+            return LocalizationService.tr("log_status.matched", language: language)
         case .ignored:
-            return "ignored"
+            return LocalizationService.tr("log_status.ignored", language: language)
         case .converted:
-            return "converted"
+            return LocalizationService.tr("log_status.converted", language: language)
         case .failed:
-            return "failed"
+            return LocalizationService.tr("log_status.failed", language: language)
         case .skippedExisting:
-            return "skippedExisting"
+            return LocalizationService.tr("log_status.skipped_existing", language: language)
         case .dryRun:
-            return "dryRun"
+            return LocalizationService.tr("log_status.dry_run", language: language)
         }
     }
 }

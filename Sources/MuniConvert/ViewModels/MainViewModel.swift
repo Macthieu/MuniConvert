@@ -18,17 +18,21 @@ enum RunState {
     case failed
 
     var displayName: String {
+        displayName(language: .french)
+    }
+
+    func displayName(language: AppLanguage) -> String {
         switch self {
         case .idle:
-            return "Prêt"
+            return LocalizationService.tr("run.status.idle", language: language)
         case .running:
-            return "En cours"
+            return LocalizationService.tr("run.status.running", language: language)
         case .completed:
-            return "Terminé"
+            return LocalizationService.tr("run.status.completed", language: language)
         case .cancelled:
-            return "Annulé"
+            return LocalizationService.tr("run.status.cancelled", language: language)
         case .failed:
-            return "Erreur"
+            return LocalizationService.tr("run.status.failed", language: language)
         }
     }
 
@@ -70,6 +74,9 @@ final class MainViewModel: ObservableObject {
         didSet { persistSettings() }
     }
     @Published var ignoreHiddenFiles: Bool = true {
+        didSet { persistSettings() }
+    }
+    @Published var appLanguage: AppLanguage = .french {
         didSet { persistSettings() }
     }
 
@@ -119,6 +126,8 @@ final class MainViewModel: ObservableObject {
         self.coordinator = coordinator
 
         loadSettings()
+        progressMessage = tr("progress.ready")
+        runSummary = tr("summary.none")
         if autoDetectLibreOffice {
             refreshLibreOfficeStatus()
         }
@@ -126,6 +135,22 @@ final class MainViewModel: ObservableObject {
 
     var selectedProfile: ConversionProfile? {
         ConversionProfile.byID(selectedProfileID)
+    }
+
+    var uiLocale: Locale {
+        Locale(identifier: appLanguage.localeIdentifier)
+    }
+
+    func tr(_ key: String) -> String {
+        LocalizationService.tr(key, language: appLanguage)
+    }
+
+    func tr(_ key: String, _ args: CVarArg...) -> String {
+        LocalizationService.tr(key, language: appLanguage, args)
+    }
+
+    func tr(_ key: String, args: [CVarArg]) -> String {
+        LocalizationService.tr(key, language: appLanguage, args)
     }
 
     var filteredProfiles: [ConversionProfile] {
@@ -155,7 +180,7 @@ final class MainViewModel: ObservableObject {
 
     var profileSummaryLines: [String] {
         guard let selectedProfile else {
-            return ["Aucun profil sélectionné."]
+            return [tr("summary.profile.none")]
         }
 
         let sources = selectedProfile.sourceExtensions
@@ -163,34 +188,34 @@ final class MainViewModel: ObservableObject {
             .joined(separator: ", ")
 
         return [
-            "Filtre source actif: \(sources) (insensible à la casse)",
-            "Extension cible: .\(selectedProfile.targetExtension)",
-            "Format LibreOffice: \(selectedProfile.libreOfficeTarget)"
+            tr("summary.profile.source_filter", sources),
+            tr("summary.profile.target_extension", selectedProfile.targetExtension),
+            tr("summary.profile.libreoffice_format", selectedProfile.libreOfficeTarget)
         ]
     }
 
     var sourcePathText: String {
-        sourceFolderURL?.path ?? "Aucun dossier source"
+        sourceFolderURL?.path ?? tr("path.none.source")
     }
 
     var outputPathText: String {
-        outputFolderURL?.path ?? "Aucun dossier de sortie"
+        outputFolderURL?.path ?? tr("path.none.output")
     }
 
     var analysisBlockers: [String] {
         var blockers: [String] = []
 
         if isRunning {
-            blockers.append("Un traitement est déjà en cours.")
+            blockers.append(tr("blocker.running"))
         }
         if sourceFolderURL == nil {
-            blockers.append("Choisir un dossier source.")
+            blockers.append(tr("blocker.choose_source"))
         }
         if selectedProfile == nil {
-            blockers.append("Choisir un type de conversion.")
+            blockers.append(tr("blocker.choose_profile"))
         }
         if useSeparateOutputFolder && outputFolderURL == nil {
-            blockers.append("Choisir un dossier de sortie.")
+            blockers.append(tr("blocker.choose_output"))
         }
 
         return blockers
@@ -199,7 +224,7 @@ final class MainViewModel: ObservableObject {
     var conversionBlockers: [String] {
         var blockers = analysisBlockers
         if !dryRunOnly && !libreOfficeFound {
-            blockers.append("LibreOffice est requis pour une conversion réelle.")
+            blockers.append(tr("blocker.libreoffice_required"))
         }
         return blockers
     }
@@ -213,33 +238,36 @@ final class MainViewModel: ObservableObject {
     }
 
     var sensitiveSettingsLines: [String] {
-        [
-            "Mode: \(dryRunOnly ? "Simulation (aucune conversion réelle)" : "Conversion réelle")",
-            "Sous-dossiers: \(includeSubdirectories ? "Oui" : "Non")",
-            "Sortie: \(outputModeDescription)",
-            "Arborescence: \(preserveTreeDescription)",
-            "Collision: \(collisionPolicy.displayName)"
+        let modeText = dryRunOnly ? tr("sensitive.mode.dry") : tr("sensitive.mode.real")
+        let yesNo = includeSubdirectories ? tr("common.yes") : tr("common.no")
+
+        return [
+            tr("sensitive.mode", modeText),
+            tr("sensitive.subdirs", yesNo),
+            tr("sensitive.output", outputModeDescription),
+            tr("sensitive.tree", preserveTreeDescription),
+            tr("sensitive.collision", collisionPolicy.displayName(language: appLanguage))
         ]
     }
 
     var conversionConfirmationMessage: String {
-        let profileName = selectedProfile?.displayName ?? "Non sélectionné"
-        let sourceLine = "Source: \(sourcePathText)"
-        let outputLine = "Sortie: \(outputModeDescription)"
-        let treeLine = "Arborescence: \(preserveTreeDescription)"
-        let collisionLine = "Collision: \(collisionPolicy.displayName)"
-        let modeLine = dryRunOnly ? "Mode: Simulation (aucun fichier créé)." : "Mode: Conversion réelle."
+        let profileName = selectedProfile?.displayName ?? tr("picker.select")
+        let sourceLine = tr("dialog.confirm.source", sourcePathText)
+        let outputLine = tr("dialog.confirm.output", outputModeDescription)
+        let treeLine = tr("dialog.confirm.tree", preserveTreeDescription)
+        let collisionLine = tr("dialog.confirm.collision", collisionPolicy.displayName(language: appLanguage))
+        let modeLine = dryRunOnly ? tr("dialog.confirm.mode.dry") : tr("dialog.confirm.mode.real")
 
         return [
-            "Profil: \(profileName)",
+            tr("dialog.confirm.profile", profileName),
             modeLine,
             sourceLine,
             outputLine,
             treeLine,
             collisionLine,
             "",
-            "Les fichiers originaux ne seront jamais modifiés ni supprimés.",
-            "Continuer ?"
+            tr("dialog.confirm.no_modify"),
+            tr("dialog.confirm.continue")
         ].joined(separator: "\n")
     }
 
@@ -252,22 +280,22 @@ final class MainViewModel: ObservableObject {
 
     private var outputModeDescription: String {
         if useSeparateOutputFolder {
-            return outputFolderURL?.path ?? "Dossier distinct non défini"
+            return outputFolderURL?.path ?? tr("output_mode.separate_undefined")
         }
-        return "Même dossier que la source"
+        return tr("output_mode.same_as_source")
     }
 
     private var preserveTreeDescription: String {
         if useSeparateOutputFolder {
-            return preserveRelativeStructure ? "Préservée" : "Non préservée"
+            return preserveRelativeStructure ? tr("tree.preserved") : tr("tree.not_preserved")
         }
-        return "Sans objet (sortie dans le dossier source)"
+        return tr("tree.not_applicable")
     }
 
     func chooseSourceFolder() {
         let panel = NSOpenPanel()
-        panel.title = "Choisir un dossier source"
-        panel.message = "Sélectionnez le dossier contenant les fichiers à convertir."
+        panel.title = tr("panel.source.title")
+        panel.message = tr("panel.source.message")
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
@@ -279,8 +307,8 @@ final class MainViewModel: ObservableObject {
 
     func chooseOutputFolder() {
         let panel = NSOpenPanel()
-        panel.title = "Choisir un dossier de sortie"
-        panel.message = "Sélectionnez le dossier où seront créés les fichiers convertis."
+        panel.title = tr("panel.output.title")
+        panel.message = tr("panel.output.message")
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
@@ -307,8 +335,8 @@ final class MainViewModel: ObservableObject {
         let path = libreOfficePath.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !path.isEmpty else {
             alertInfo = AlertInfo(
-                title: "Chemin manquant",
-                message: "Saisissez un chemin vers soffice avant le test."
+                title: tr("alert.path_missing"),
+                message: tr("alert.path_missing_message")
             )
             return
         }
@@ -320,13 +348,13 @@ final class MainViewModel: ObservableObject {
 
         if info.isFound {
             alertInfo = AlertInfo(
-                title: "LibreOffice détecté",
-                message: "Version: \(info.version.isEmpty ? "inconnue" : info.version)"
+                title: tr("alert.libreoffice_found"),
+                message: tr("alert.libreoffice_found_message", info.version.isEmpty ? "unknown" : info.version)
             )
         } else {
             alertInfo = AlertInfo(
-                title: "LibreOffice introuvable",
-                message: "Le chemin indiqué n'est pas exécutable."
+                title: tr("alert.libreoffice_not_found"),
+                message: tr("alert.libreoffice_not_found_message")
             )
         }
     }
@@ -334,7 +362,7 @@ final class MainViewModel: ObservableObject {
     func analyze() {
         do {
             let options = try buildOptions()
-            startNewRun(initialMessage: "Analyse en cours")
+            startNewRun(initialMessage: tr("progress.analyzing"))
 
             runTask = Task {
                 do {
@@ -343,14 +371,14 @@ final class MainViewModel: ObservableObject {
                         eventHandler: eventHandler()
                     )
                     self.stats = computedStats
-                    finishRun(operationLabel: "Analyse")
+                    finishRun(operationLabel: tr("label.analysis"))
                 } catch {
-                    handleRunError(error, operationLabel: "Analyse")
-                    finishRun(operationLabel: "Analyse")
+                    handleRunError(error, operationLabel: tr("label.analysis"))
+                    finishRun(operationLabel: tr("label.analysis"))
                 }
             }
         } catch {
-            alertInfo = AlertInfo(title: "Analyse impossible", message: error.localizedDescription)
+            alertInfo = AlertInfo(title: tr("alert.analyze_impossible"), message: error.localizedDescription)
         }
     }
 
@@ -369,8 +397,8 @@ final class MainViewModel: ObservableObject {
                 executableURL = URL(fileURLWithPath: libreOfficePath)
             }
 
-            startNewRun(initialMessage: options.dryRun ? "Simulation en cours" : "Conversion en cours")
-            let operationLabel = options.dryRun ? "Simulation" : "Conversion"
+            startNewRun(initialMessage: options.dryRun ? tr("progress.simulating") : tr("progress.converting"))
+            let operationLabel = options.dryRun ? tr("label.simulation") : tr("label.conversion")
 
             runTask = Task {
                 do {
@@ -387,7 +415,7 @@ final class MainViewModel: ObservableObject {
                 }
             }
         } catch {
-            alertInfo = AlertInfo(title: "Conversion impossible", message: error.localizedDescription)
+            alertInfo = AlertInfo(title: tr("alert.conversion_impossible"), message: error.localizedDescription)
         }
     }
 
@@ -396,8 +424,8 @@ final class MainViewModel: ObservableObject {
             return
         }
 
-        progressMessage = "Annulation en cours..."
-        runSummary = "Annulation demandée..."
+        progressMessage = tr("progress.cancelling")
+        runSummary = tr("summary.cancelling")
 
         runTask?.cancel()
         Task {
@@ -409,19 +437,19 @@ final class MainViewModel: ObservableObject {
         logs.removeAll()
         stats = ConversionStats()
         progress = 0
-        progressMessage = "Prêt"
+        progressMessage = tr("progress.ready")
         runState = .idle
-        runSummary = "Aucun traitement exécuté."
+        runSummary = tr("summary.none")
     }
 
     func exportLogs() {
         guard !logs.isEmpty else {
-            alertInfo = AlertInfo(title: "Journal vide", message: "Aucune entrée à exporter.")
+            alertInfo = AlertInfo(title: tr("alert.log_empty"), message: tr("alert.log_empty_message"))
             return
         }
 
         let panel = NSSavePanel()
-        panel.title = "Exporter le journal"
+        panel.title = tr("panel.export_log.title")
         panel.nameFieldStringValue = defaultLogFileName()
         panel.allowedContentTypes = [.plainText]
 
@@ -432,12 +460,12 @@ final class MainViewModel: ObservableObject {
         do {
             try buildLogText().write(to: destinationURL, atomically: true, encoding: .utf8)
             alertInfo = AlertInfo(
-                title: "Export réussi",
-                message: "Journal exporté vers:\n\(destinationURL.path)"
+                title: tr("alert.export_success"),
+                message: tr("alert.export_success_message", destinationURL.path)
             )
         } catch {
             alertInfo = AlertInfo(
-                title: "Export échoué",
+                title: tr("alert.export_failed"),
                 message: error.localizedDescription
             )
         }
@@ -446,8 +474,8 @@ final class MainViewModel: ObservableObject {
     func openOutputFolderInFinder() {
         guard let folder = activeOutputFolder else {
             alertInfo = AlertInfo(
-                title: "Aucun dossier",
-                message: "Sélectionnez un dossier source ou un dossier de sortie."
+                title: tr("alert.no_folder"),
+                message: tr("alert.no_folder_message")
             )
             return
         }
@@ -463,7 +491,7 @@ final class MainViewModel: ObservableObject {
         progressMessage = initialMessage
         isRunning = true
         runState = .running
-        runSummary = "Traitement en cours..."
+        runSummary = tr("summary.running")
     }
 
     private func finishRun(operationLabel: String) {
@@ -478,19 +506,19 @@ final class MainViewModel: ObservableObject {
 
         switch runState {
         case .completed:
-            progressMessage = "\(operationLabel) terminée"
-            runSummary = buildSummary(prefix: "\(operationLabel) terminée")
+            progressMessage = tr("run.finished", operationLabel)
+            runSummary = buildSummary(prefix: tr("run.finished", operationLabel))
         case .cancelled:
-            progressMessage = "\(operationLabel) annulée"
-            runSummary = buildSummary(prefix: "\(operationLabel) annulée")
+            progressMessage = tr("run.cancelled", operationLabel)
+            runSummary = buildSummary(prefix: tr("run.cancelled", operationLabel))
         case .failed:
-            if runSummary == "Traitement en cours..." || runSummary == "Aucun traitement exécuté." {
-                runSummary = "\(operationLabel) interrompue."
+            if runSummary == tr("summary.running") || runSummary == tr("summary.none") {
+                runSummary = tr("run.interrupted", operationLabel)
             }
-            progressMessage = "\(operationLabel) en erreur"
+            progressMessage = tr("run.failed", operationLabel)
         case .idle:
-            progressMessage = "Prêt"
-            runSummary = "Aucun traitement exécuté."
+            progressMessage = tr("progress.ready")
+            runSummary = tr("summary.none")
         case .running:
             break
         }
@@ -501,18 +529,18 @@ final class MainViewModel: ObservableObject {
     private func handleRunError(_ error: Error, operationLabel: String) {
         if let mcError = error as? MuniConvertError, case .cancelled = mcError {
             runState = .cancelled
-            runSummary = buildSummary(prefix: "\(operationLabel) annulée")
+            runSummary = buildSummary(prefix: tr("run.cancelled", operationLabel))
             return
         }
 
         runState = .failed
-        runSummary = "\(operationLabel) interrompue: \(error.localizedDescription)"
-        alertInfo = AlertInfo(title: "Erreur", message: error.localizedDescription)
+        runSummary = "\(tr("run.interrupted", operationLabel)): \(error.localizedDescription)"
+        alertInfo = AlertInfo(title: tr("alert.error"), message: error.localizedDescription)
     }
 
     private func buildOptions() throws -> ConversionOptions {
         guard let sourceFolderURL else {
-            throw MuniConvertError.sourceFolderInvalid("Aucun dossier source")
+            throw MuniConvertError.sourceFolderInvalid(tr("error.source_folder_none"))
         }
 
         guard let selectedProfile else {
@@ -520,7 +548,7 @@ final class MainViewModel: ObservableObject {
         }
 
         if useSeparateOutputFolder && outputFolderURL == nil {
-            throw MuniConvertError.outputFolderInvalid("Aucun dossier de sortie")
+            throw MuniConvertError.outputFolderInvalid(tr("error.output_folder_none"))
         }
 
         return ConversionOptions(
@@ -555,7 +583,17 @@ final class MainViewModel: ObservableObject {
     }
 
     private func buildSummary(prefix: String) -> String {
-        "\(prefix) — Scannés: \(stats.totalScanned), Correspondants: \(stats.totalMatched), Convertis: \(stats.converted), Simulation: \(stats.dryRun), Ignorés: \(stats.ignored), Ignorés (cible existe): \(stats.skippedExisting), Erreurs: \(stats.errors)."
+        tr(
+            "summary.line",
+            prefix,
+            stats.totalScanned,
+            stats.totalMatched,
+            stats.converted,
+            stats.dryRun,
+            stats.ignored,
+            stats.skippedExisting,
+            stats.errors
+        )
     }
 
     private func deriveStatsFromLogs() -> ConversionStats {
@@ -583,6 +621,7 @@ final class MainViewModel: ObservableObject {
         selectedProfileID = stored.selectedProfileID
         collisionPolicy = CollisionPolicy(rawValue: stored.collisionPolicy) ?? .skipExisting
         libreOfficePath = stored.libreOfficePath
+        appLanguage = AppLanguage(rawValue: stored.appLanguage ?? AppLanguage.french.rawValue) ?? .french
     }
 
     private func persistSettings() {
@@ -596,7 +635,8 @@ final class MainViewModel: ObservableObject {
             ignoreHiddenFiles: ignoreHiddenFiles,
             selectedProfileID: selectedProfileID,
             collisionPolicy: collisionPolicy.rawValue,
-            libreOfficePath: libreOfficePath
+            libreOfficePath: libreOfficePath,
+            appLanguage: appLanguage.rawValue
         )
 
         settingsStore.save(settings)
@@ -622,14 +662,14 @@ final class MainViewModel: ObservableObject {
         formatter.timeStyle = .medium
 
         var lines: [String] = []
-        lines.append("MuniConvert - Journal")
-        lines.append("Date export: \(formatter.string(from: Date()))")
-        lines.append(stats.summaryLine)
+        lines.append(tr("log.export.header"))
+        lines.append(tr("log.export.date", formatter.string(from: Date())))
+        lines.append(stats.summaryLine(language: appLanguage))
         lines.append("")
 
         for entry in logs {
             let date = formatter.string(from: entry.date)
-            let line = "[\(date)] [\(entry.status.displayName)] source=\(entry.sourcePath) output=\(entry.outputPath) message=\(entry.message)"
+            let line = "[\(date)] [\(entry.status.displayName(language: appLanguage))] source=\(entry.sourcePath) output=\(entry.outputPath) message=\(entry.message)"
             lines.append(line)
         }
 

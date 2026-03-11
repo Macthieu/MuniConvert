@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "MuniConvert",
+    defaultLocalization: "fr",
     platforms: [
         .macOS(.v13)
     ],
@@ -18,7 +19,10 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "MuniConvert",
-            path: "Sources/MuniConvert"
+            path: "Sources/MuniConvert",
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "MuniConvertTests",

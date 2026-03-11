@@ -13,6 +13,7 @@ struct StoredSettings: Codable {
     var selectedProfileID: String?
     var collisionPolicy: String
     var libreOfficePath: String
+    var appLanguage: String?
 
     static let `default` = StoredSettings(
         sourcePath: nil,
@@ -24,7 +25,8 @@ struct StoredSettings: Codable {
         ignoreHiddenFiles: true,
         selectedProfileID: nil,
         collisionPolicy: CollisionPolicy.skipExisting.rawValue,
-        libreOfficePath: ""
+        libreOfficePath: "",
+        appLanguage: AppLanguage.french.rawValue
     )
 }
 

@@ -54,6 +54,14 @@ MuniConvert est une application macOS (Swift + SwiftUI) qui orchestre des conver
 - Détection et test de LibreOffice
 - Arrêt en cours de traitement
 - Mémorisation des derniers réglages
+- Interface multilingue (Français / English) avec sélection de langue dans l'app
+
+## Captures d’écran
+
+![Vue principale](docs/images/screenshot-main-view.png)
+![Conversion en cours](docs/images/screenshot-conversion-running.png)
+![Table des résultats](docs/images/screenshot-results-table.png)
+![Paramètres et langue](docs/images/screenshot-settings-locale.png)
 
 ## Le logiciel ne modifie jamais les originaux
 
@@ -109,9 +117,10 @@ swift run MuniConvert
 1. Choisir un dossier source.
 2. Choisir le profil de conversion.
 3. Configurer les options (sous-dossiers, sortie, collisions).
-4. Optionnel : activer `Simulation seulement`.
-5. Cliquer sur `Analyser` puis `Lancer la conversion`.
-6. Contrôler le journal et exporter le log si nécessaire.
+4. Choisir la langue de l’interface dans `Paramètres` si besoin.
+5. Optionnel : activer `Simulation seulement`.
+6. Cliquer sur `Analyser` puis `Lancer la conversion`.
+7. Contrôler le journal et exporter le log si nécessaire.
 
 ## Structure du projet
 
@@ -138,7 +147,7 @@ MuniConvert/
 
 - Qualité de conversion dépendante de LibreOffice et des documents d’entrée.
 - Traitement séquentiel (pas de parallélisation dans ce MVP).
-- Pas encore de suite de tests unitaires automatisés.
+- Traduction actuellement fournie en 2 langues (FR/EN).
 
 ## Feuille de route courte
 

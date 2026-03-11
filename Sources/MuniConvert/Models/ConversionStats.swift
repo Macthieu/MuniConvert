@@ -16,6 +16,22 @@ struct ConversionStats {
     }
 
     var summaryLine: String {
-        "Scannés: \(totalScanned) | Correspondants: \(totalMatched) | Convertis: \(converted) | Ignorés: \(ignored) | Existant ignoré: \(skippedExisting) | Simulation: \(dryRun) | Erreurs: \(errors)"
+        summaryLine(language: .french)
+    }
+
+    func summaryLine(language: AppLanguage) -> String {
+        LocalizationService.tr(
+            "stats.summary",
+            language: language,
+            [
+                totalScanned,
+                totalMatched,
+                converted,
+                ignored,
+                skippedExisting,
+                dryRun,
+                errors
+            ]
+        )
     }
 }

@@ -10,24 +10,32 @@ enum CollisionPolicy: String, CaseIterable, Identifiable, Codable {
     var id: String { rawValue }
 
     var displayName: String {
-        switch self {
-        case .skipExisting:
-            return "Ignorer si existe"
-        case .overwrite:
-            return "Remplacer"
-        case .renameWithSuffix:
-            return "Renommer automatiquement"
-        }
+        displayName(language: .french)
     }
 
     var compactDisplayName: String {
+        compactDisplayName(language: .french)
+    }
+
+    func displayName(language: AppLanguage) -> String {
         switch self {
         case .skipExisting:
-            return "Ignorer"
+            return LocalizationService.tr("collision.skip", language: language)
         case .overwrite:
-            return "Remplacer"
+            return LocalizationService.tr("collision.overwrite", language: language)
         case .renameWithSuffix:
-            return "Renommer"
+            return LocalizationService.tr("collision.rename", language: language)
+        }
+    }
+
+    func compactDisplayName(language: AppLanguage) -> String {
+        switch self {
+        case .skipExisting:
+            return LocalizationService.tr("collision.skip.compact", language: language)
+        case .overwrite:
+            return LocalizationService.tr("collision.overwrite.compact", language: language)
+        case .renameWithSuffix:
+            return LocalizationService.tr("collision.rename.compact", language: language)
         }
     }
 }

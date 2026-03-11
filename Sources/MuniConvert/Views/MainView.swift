@@ -22,22 +22,23 @@ struct MainView: View {
         .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .frame(minWidth: 1200, minHeight: 780)
+        .environment(\.locale, viewModel.uiLocale)
         .alert(item: $viewModel.alertInfo) { alert in
             Alert(
                 title: Text(alert.title),
                 message: Text(alert.message),
-                dismissButton: .default(Text("OK"))
+                dismissButton: .default(Text(t("alert.ok")))
             )
         }
         .confirmationDialog(
-            "Confirmer la conversion",
+            t("dialog.confirm_conversion.title"),
             isPresented: $showRealConversionConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Lancer", role: .destructive) {
+            Button(t("dialog.confirm.launch"), role: .destructive) {
                 viewModel.startConversion()
             }
-            Button("Annuler", role: .cancel) {}
+            Button(t("dialog.confirm.cancel"), role: .cancel) {}
         } message: {
             Text(viewModel.conversionConfirmationMessage)
         }
@@ -46,9 +47,9 @@ struct MainView: View {
     private var header: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("MuniConvert")
+                Text(t("app.title"))
                     .font(.title2.weight(.semibold))
-                Text("Conversion documentaire en lot via LibreOffice")
+                Text(t("app.subtitle"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -56,13 +57,13 @@ struct MainView: View {
             Spacer()
 
             statusPill(
-                title: "LibreOffice",
-                value: viewModel.libreOfficeFound ? "trouvé" : "non trouvé",
+                title: t("status.libreoffice"),
+                value: viewModel.libreOfficeFound ? t("status.found") : t("status.not_found"),
                 isGood: viewModel.libreOfficeFound
             )
 
             if viewModel.dryRunOnly {
-                statusPill(title: "Mode", value: "SIMULATION", isGood: true)
+                statusPill(title: t("status.mode"), value: t("status.simulation"), isGood: true)
             }
         }
         .padding(12)
@@ -92,27 +93,27 @@ struct MainView: View {
     }
 
     private var selectionZone: some View {
-        SectionCard(step: "1", title: "Sélection") {
+        SectionCard(step: "1", title: t("section.selection")) {
             VStack(alignment: .leading, spacing: 10) {
                 folderPickerRow(
-                    label: "Dossier source",
-                    buttonTitle: "Choisir un dossier",
+                    label: t("label.source_folder"),
+                    buttonTitle: t("button.choose_source_folder"),
                     pathText: viewModel.sourcePathText,
                     buttonStyle: .prominent,
                     isDisabled: false,
                     action: viewModel.chooseSourceFolder
                 )
 
-                Toggle("Inclure les sous-dossiers", isOn: $viewModel.includeSubdirectories)
-                Toggle("Utiliser un dossier de sortie distinct", isOn: $viewModel.useSeparateOutputFolder)
-                Toggle("Préserver l'arborescence", isOn: $viewModel.preserveRelativeStructure)
+                Toggle(t("toggle.include_subdirs"), isOn: $viewModel.includeSubdirectories)
+                Toggle(t("toggle.use_separate_output"), isOn: $viewModel.useSeparateOutputFolder)
+                Toggle(t("toggle.preserve_tree"), isOn: $viewModel.preserveRelativeStructure)
                     .disabled(!viewModel.useSeparateOutputFolder)
-                Toggle("Simulation seulement (aucune conversion)", isOn: $viewModel.dryRunOnly)
-                Toggle("Ignorer fichiers cachés", isOn: $viewModel.ignoreHiddenFiles)
+                Toggle(t("toggle.dry_run"), isOn: $viewModel.dryRunOnly)
+                Toggle(t("toggle.ignore_hidden"), isOn: $viewModel.ignoreHiddenFiles)
 
                 folderPickerRow(
-                    label: "Dossier de sortie",
-                    buttonTitle: "Choisir dossier de sortie",
+                    label: t("label.output_folder"),
+                    buttonTitle: t("button.choose_output_folder"),
                     pathText: viewModel.outputPathText,
                     buttonStyle: .regular,
                     isDisabled: !viewModel.useSeparateOutputFolder,
@@ -123,28 +124,28 @@ struct MainView: View {
     }
 
     private var conversionZone: some View {
-        SectionCard(step: "2", title: "Conversion") {
+        SectionCard(step: "2", title: t("section.conversion")) {
             VStack(alignment: .leading, spacing: 10) {
                 if viewModel.dryRunOnly {
                     requirementBox(
-                        title: "MODE SIMULATION ACTIF",
-                        lines: ["Aucune commande de conversion réelle ne sera exécutée."],
+                        title: t("box.simulation.title"),
+                        lines: [t("box.simulation.line")],
                         color: .orange
                     )
                 }
 
-                labeledRow(label: "Recherche profil") {
-                    TextField("Ex: doc, pdf, odt...", text: $viewModel.profileSearchText)
+                labeledRow(label: t("label.profile_search")) {
+                    TextField(t("placeholder.profile_search"), text: $viewModel.profileSearchText)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(.caption, design: .monospaced))
                 }
 
-                labeledRow(label: "Type de conversion") {
-                    Picker("Type de conversion", selection: $viewModel.selectedProfileID) {
+                labeledRow(label: t("label.conversion_type")) {
+                    Picker(t("label.conversion_type"), selection: $viewModel.selectedProfileID) {
                         if !viewModel.hasFilteredProfiles {
-                            Text("Aucun profil trouvé").tag(String?.none)
+                            Text(t("picker.no_profile")).tag(String?.none)
                         }
-                        Text("Sélectionner...").tag(String?.none)
+                        Text(t("picker.select")).tag(String?.none)
                         ForEach(viewModel.filteredProfiles) { profile in
                             Text(profile.displayName).tag(String?.some(profile.id))
                         }
@@ -153,23 +154,23 @@ struct MainView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                labeledRow(label: "Collision") {
-                    Picker("Collision", selection: $viewModel.collisionPolicy) {
+                labeledRow(label: t("label.collision")) {
+                    Picker(t("label.collision"), selection: $viewModel.collisionPolicy) {
                         ForEach(CollisionPolicy.allCases) { policy in
-                            Text(policy.compactDisplayName).tag(policy)
+                            Text(policy.compactDisplayName(language: viewModel.appLanguage)).tag(policy)
                         }
                     }
                     .pickerStyle(.segmented)
-                    .help("Politique en cas de fichier cible existant.")
+                    .help(t("helper.collision_help"))
                 }
 
                 HStack(spacing: 8) {
-                    Button("Analyser") {
+                    Button(t("button.analyze")) {
                         viewModel.analyze()
                     }
                     .disabled(!viewModel.canAnalyze)
 
-                    Button("Lancer la conversion") {
+                    Button(t("button.start_conversion")) {
                         if viewModel.dryRunOnly {
                             viewModel.startConversion()
                         } else {
@@ -179,34 +180,34 @@ struct MainView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(!viewModel.canStartConversion)
 
-                    Button("Arrêter") {
+                    Button(t("button.stop")) {
                         viewModel.stopCurrentRun()
                     }
                     .disabled(!viewModel.isRunning)
                 }
 
                 requirementBox(
-                    title: "Résumé du profil actif",
+                    title: t("box.profile_summary.title"),
                     lines: viewModel.profileSummaryLines,
                     color: .blue
                 )
 
                 requirementBox(
-                    title: "Paramètres sensibles",
+                    title: t("box.sensitive.title"),
                     lines: viewModel.sensitiveSettingsLines,
                     color: .secondary
                 )
 
                 if !viewModel.canStartConversion {
                     requirementBox(
-                        title: "Conversion indisponible: préconditions manquantes",
+                        title: t("box.blocked.title"),
                         lines: viewModel.conversionBlockers,
                         color: .red
                     )
                 } else {
                     requirementBox(
-                        title: "Conversion disponible",
-                        lines: ["Toutes les préconditions sont remplies."],
+                        title: t("box.available.title"),
+                        lines: [t("box.available.line")],
                         color: .green
                     )
                 }
@@ -215,47 +216,57 @@ struct MainView: View {
     }
 
     private var settingsZone: some View {
-        SectionCard(step: "4", title: "Paramètres") {
+        SectionCard(step: "4", title: t("section.settings")) {
             VStack(alignment: .leading, spacing: 10) {
-                labeledRow(label: "LibreOffice") {
-                    TextField("Chemin vers soffice", text: $viewModel.libreOfficePath)
+                labeledRow(label: t("label.language")) {
+                    Picker(t("label.language"), selection: $viewModel.appLanguage) {
+                        ForEach(AppLanguage.allCases) { language in
+                            Text(language.displayName(in: viewModel.appLanguage)).tag(language)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                labeledRow(label: t("label.libreoffice")) {
+                    TextField(t("placeholder.libreoffice_path"), text: $viewModel.libreOfficePath)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(.caption, design: .monospaced))
                 }
 
                 HStack(spacing: 8) {
-                    Button("Détecter") {
+                    Button(t("button.detect")) {
                         viewModel.refreshLibreOfficeStatus()
                     }
-                    Button("Tester LibreOffice") {
+                    Button(t("button.test_libreoffice")) {
                         viewModel.testLibreOfficePath()
                     }
                 }
 
                 HStack(spacing: 8) {
-                    Text(viewModel.libreOfficeFound ? "État: trouvé" : "État: non trouvé")
+                    Text(viewModel.libreOfficeFound ? t("status.state_found") : t("status.state_not_found"))
                         .foregroundStyle(viewModel.libreOfficeFound ? .green : .red)
                         .font(.caption)
 
                     if !viewModel.libreOfficeVersion.isEmpty {
-                        Text("Version: \(viewModel.libreOfficeVersion)")
+                        Text(t("status.version_format", viewModel.libreOfficeVersion))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
 
                 HStack(spacing: 8) {
-                    Button("Ouvrir le dossier de sortie") {
+                    Button(t("button.open_output_folder")) {
                         viewModel.openOutputFolderInFinder()
                     }
                     .disabled(viewModel.activeOutputFolder == nil)
 
-                    Button("Exporter le journal (.txt)") {
+                    Button(t("button.export_log")) {
                         viewModel.exportLogs()
                     }
                     .disabled(viewModel.logs.isEmpty)
 
-                    Button("Effacer le journal") {
+                    Button(t("button.clear_log")) {
                         viewModel.clearLogs()
                     }
                 }
@@ -264,7 +275,7 @@ struct MainView: View {
     }
 
     private var resultsZone: some View {
-        SectionCard(step: "3", title: "Résultats") {
+        SectionCard(step: "3", title: t("section.results")) {
             VStack(alignment: .leading, spacing: 10) {
                 runStateBanner
                 ProgressView(value: viewModel.progress)
@@ -289,7 +300,7 @@ struct MainView: View {
                 statsSummary
 
                 Table(viewModel.logs) {
-                    TableColumn("Fichier source") { entry in
+                    TableColumn(t("label.source_folder")) { entry in
                         Text(entry.sourcePath)
                             .font(.system(.caption, design: .monospaced))
                             .lineLimit(1)
@@ -297,13 +308,13 @@ struct MainView: View {
                     }
                     .width(min: 320)
 
-                    TableColumn("Statut") { entry in
-                        Text(entry.status.displayName)
+                    TableColumn(t("label.status")) { entry in
+                        Text(entry.status.displayName(language: viewModel.appLanguage))
                             .font(.caption)
                     }
                     .width(min: 110, max: 140)
 
-                    TableColumn("Fichier de sortie") { entry in
+                    TableColumn(t("label.output_folder")) { entry in
                         Text(entry.outputPath)
                             .font(.system(.caption, design: .monospaced))
                             .lineLimit(1)
@@ -311,7 +322,7 @@ struct MainView: View {
                     }
                     .width(min: 300)
 
-                    TableColumn("Message") { entry in
+                    TableColumn(t("label.message")) { entry in
                         Text(entry.message)
                             .lineLimit(1)
                             .truncationMode(.tail)
@@ -319,7 +330,7 @@ struct MainView: View {
                 }
                 .frame(minHeight: 420)
 
-                Text(viewModel.stats.summaryLine)
+                Text(viewModel.stats.summaryLine(language: viewModel.appLanguage))
                     .font(.system(.footnote, design: .monospaced))
                     .textSelection(.enabled)
             }
@@ -328,11 +339,11 @@ struct MainView: View {
 
     private var runStateBanner: some View {
         HStack(spacing: 8) {
-            Text("État du lot")
+            Text(t("run.state"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Text(viewModel.runState.displayName.uppercased())
+            Text(viewModel.runState.displayName(language: viewModel.appLanguage).uppercased())
                 .font(.caption.monospacedDigit())
                 .fontWeight(.semibold)
                 .foregroundStyle(viewModel.runState.color)
@@ -458,6 +469,14 @@ struct MainView: View {
             Capsule(style: .continuous)
                 .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
         )
+    }
+
+    private func t(_ key: String) -> String {
+        viewModel.tr(key)
+    }
+
+    private func t(_ key: String, _ args: CVarArg...) -> String {
+        viewModel.tr(key, args: args)
     }
 
     private func requirementBox(title: String, lines: [String], color: Color) -> some View {
