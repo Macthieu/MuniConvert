@@ -68,3 +68,23 @@ Sans ces secrets, le workflow publie tout de même un ZIP non signé.
 Astuce:
 
 - Utiliser `scripts/release/configure_github_secrets.sh` pour injecter tous les secrets en une seule commande.
+
+## Mode sans compte Apple Developer
+
+Si tu n'as pas de compte Apple Developer, conserve simplement le mode non signé:
+
+- ne configure pas les secrets Apple
+- déclenche le workflow release
+- récupère l'archive `*-unsigned.zip`
+
+Installation côté utilisateur:
+
+1. Décompresser le ZIP
+2. Clic droit sur `MuniConvert.app` puis `Ouvrir`
+3. Confirmer dans la fenêtre de sécurité macOS
+4. Si blocage persistant: `Réglages Système > Confidentialité et sécurité > Ouvrir quand même`
+
+Note:
+
+- Ce mode est adapté à un usage personnel/interne.
+- Pour une distribution large sans alertes Gatekeeper, la signature/notarisation reste recommandée.

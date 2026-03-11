@@ -159,6 +159,19 @@ MuniConvert/
 - Guide distribution : `docs/MACOS_DISTRIBUTION.md`
 - Setup secrets Apple pour signature/notarisation : `docs/APPLE_SECRETS_SETUP.md`
 
+### Sans compte Apple Developer
+
+MuniConvert peut être distribué sans signature/notarisation:
+
+- Le workflow release publie un ZIP non signé (`*-unsigned.zip`)
+- L'application reste utilisable localement
+
+Premier lancement sur macOS (app non signée):
+
+1. Clic droit sur l'app > `Ouvrir`
+2. Confirmer l'ouverture
+3. Si nécessaire: `Réglages Système > Confidentialité et sécurité > Ouvrir quand même`
+
 ## Licence GPLv3
 
 Ce projet est distribué sous licence **GNU General Public License v3.0**.
