@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-03-11
+
+### Added
+
+- Stable baseline of MuniConvert as a macOS SwiftUI batch conversion utility
+- Strong UX guardrails before real conversion (preconditions, clear blockers, enriched confirmation)
+- Profile workflow improvements:
+  - extended built-in profile set (including OpenDocument and inverse legacy conversions)
+  - profile quick search
+  - active profile summary
+- Expanded unit test coverage:
+  - scanner/path utilities
+  - ViewModel blockers/profile logic
+- GitHub repository health files:
+  - SECURITY policy
+  - issue templates
+  - pull request template
+- Build/release operational guide in `docs/BUILD_AND_RELEASE.md`
+
+### Changed
+
+- CI now validates both build and test (`swift build` + `swift test`)
+- Overall project readiness improved for open-source maintenance and repeatable releases
+
 ## [0.3.0] - 2026-03-11
 
 ### Added
