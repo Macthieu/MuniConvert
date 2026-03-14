@@ -122,6 +122,12 @@ swift build
 swift run MuniConvert
 ```
 
+Mode canonique OrchivisteKit (CLI JSON V1) :
+
+```bash
+swift run municonversion-cli run --request request.json --result result.json
+```
+
 ## Utilisation
 
 1. Choisir un dossier source.
@@ -131,6 +137,20 @@ swift run MuniConvert
 5. Optionnel : activer `Simulation seulement`.
 6. Cliquer sur `Analyser` puis `Lancer la conversion`.
 7. Contrôler le journal et exporter le log si nécessaire.
+
+## Mode canonique OrchivisteKit (CLI JSON V1)
+
+Le mode canonique est disponible via `municonversion-cli` avec la commande:
+
+```bash
+municonversion-cli run --request <file> --result <file>
+```
+
+Points de sécurité:
+
+- `dry_run=true` par défaut
+- conversion réelle uniquement avec `dry_run=false` et `confirm_convert=true`
+- sans confirmation explicite, la commande retourne une erreur canonique et n'exécute aucune conversion destructive
 
 ## Structure du projet
 
@@ -211,7 +231,7 @@ Ce projet est distribué sous licence **GNU General Public License v3.0**.
 ## Versionnage
 
 - Le projet suit `Semantic Versioning`.
-- Référence actuelle: `1.1.0`.
+- Référence actuelle: `1.3.0`.
 
 ## Note de transition de nommage
 

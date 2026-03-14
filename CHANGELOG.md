@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-03-14
+
+### Added
+
+- Canonical OrchivisteKit CLI mode:
+  - `municonversion-cli run --request <file> --result <file>`
+  - JSON request/result flow based on `OrchivisteKitContracts` types
+- Progressive integration layer for canonical execution:
+  - `MuniConvertCore` service adapter for existing conversion engine
+  - `MuniConvertInterop` adapter mapping canonical requests/results and progress events
+- New interop/CLI tests for canonical argument parsing and safety constraints.
+
+### Changed
+
+- Safe-by-default execution policy for canonical `convert` action:
+  - `dry_run=true` by default
+  - real conversion only when `dry_run=false` and `confirm_convert=true`
+- Package structure now exposes dedicated products/targets for app, core, interop and canonical CLI while preserving existing `MuniConvert` app product.
+
 ## [1.2.0] - 2026-03-11
 
 ### Added
